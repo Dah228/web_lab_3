@@ -1,0 +1,116 @@
+body {
+    font-family: "DejaVu Sans Condensed", serif;
+    background-color: white;
+    /*background-image: url("img.png");*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: center;*/
+    /*background-size: cover;*/
+
+}
+
+#my_data {
+    font-family: cursive;
+    color: darkblue;
+    font-size: 28px;
+
+}
+
+#main_page_table {
+    width: 100%;
+    border: none;
+    border-spacing: 5px;
+}
+
+.anime_lol::before {
+    content: "⭐";
+    width: 10px;
+    height: 10px;
+}
+
+#drawing_pic {
+    text-align: center
+}
+
+#main_page_table td:first-child {
+    width: 40%;
+}
+
+#main_page_table td:last-child {
+    width: 60%;
+}
+
+#results-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: auto;
+}
+
+#results-table th,
+#results-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+#results-table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    margin: 5px;
+    padding: 5px;
+    width: 120px;
+    border: 1px solid #ccc;
+}
+
+select {
+    margin: 5px;
+    padding: 5px;
+    width: 130px;
+}
+
+#send_button {
+    margin: 10px 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.results-scroll {
+    max-height: 600px;
+    overflow: auto;
+}
+
+#results-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f0f0f0;
+}
+
+
+#x-buttons button {
+    min-width: 44px;
+    margin: 3px;
+    padding: 8px;
+    cursor: pointer;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+
+#x-buttons button.selected {
+    background-color: #2563eb;
+    color: white;
+}
+
+#picture {
+    max-width: 100%;
+    height: auto;
+    cursor: crosshair;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
