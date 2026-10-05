@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -5,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ПРОВЕРКА ПОПАДАНИЯ</title>
 
-    <style>
-        @import url('styles.css');
-    </style>
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/styles.css">
 </head>
 
 <body>
@@ -28,7 +28,9 @@
 
 
         <td>
-            <form id="form_to_input">
+            <form id="form_to_input"
+                  action="${pageContext.request.contextPath}/controller"
+                  method="get">
 
                 <fieldset id="x-buttons">
                     <legend>Координата X:</legend>
@@ -80,7 +82,6 @@
                         <th>R</th>
                         <th>Результат</th>
                         <th>Дата и время</th>
-                        <th>Время работы Сервера</th>
                     </tr>
                     </thead>
                     <tbody id="results-body"></tbody>
@@ -92,6 +93,6 @@
 
 </table>
 
-<script src="logic.js"></script>
+<script src="${pageContext.request.contextPath}/logic.js"></script>
 </body>
 </html>

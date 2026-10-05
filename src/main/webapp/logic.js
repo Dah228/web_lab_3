@@ -187,7 +187,6 @@ function add_element_to_table(record) {
         record.r,
         record.isHit ? 'Попала' : 'Не попала',
         new Date(record.timestamp).toLocaleString('ru-RU'),
-        record.executionTime.toFixed(3)
     ];
 
     cells.forEach(value => {
@@ -203,56 +202,34 @@ function add_element_to_table(record) {
 }
 
 form.addEventListener('submit', function(event) {
-    event.preventDefault();
+    const xText = coord_X.value.trim();
+    const x = Number(xText);
 
     const selectedR =
         document.querySelector('input[name="radius_R"]:checked');
 
-    const xText = coord_X.value.trim();
-    const x = Number(xText);
-
     if (xText === '' || !allowedX.includes(x)) {
+        event.preventDefault();
         alert('Выберите X с помощью кнопок.');
         return;
     }
 
     if (!input_is_correct(coord_Y.value)) {
-        alert('Введите число Y: −5 < Y < 3. Границы не включены.');
+        event.preventDefault();
+        alert('Введите число Y: −5 < Y < 3.');
         return;
     }
 
     if (!selectedR || !allowedR.includes(Number(selectedR.value))) {
+        event.preventDefault();
         alert('Выберите радиус R.');
         return;
     }
 
-    const y = Number(coord_Y.value.trim().replace(',', '.'));
-    const r = Number(selectedR.value);
-
-    const start = performance.now();
-    const isHit = check_hit(x, y, r);
-    const executionTime = performance.now() - start;
-
-    checkedPoints.push({ x, y, r, isHit });
-    points_to_canvas(x, y, isHit);
-
-    add_element_to_table({
-        x,
-        y,
-        r,
-        isHit,
-        timestamp: Date.now(),
-        executionTime
-    });
+    // Перед отправкой заменяем десятичную запятую на точку.
+    coord_Y.value = coord_Y.value.trim().replace(',', '.');
 });
 
-// Пока проверка выполняется в браузере, а не на сервере.
-const timeHeader =
-    document.querySelector('#results-table thead tr th:last-child');
-
-if (timeHeader) {
-    timeHeader.textContent = 'Время проверки, мс';
-}
 
 
 canvas.addEventListener('click', function(event) {
