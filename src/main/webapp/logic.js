@@ -140,7 +140,14 @@ function points_to_canvas(x, y, isHit) {
     ctx.fill();
 }
 
-const checkedPoints = [];
+const checkedPoints = Array.from(
+    document.querySelectorAll('#results-body tr[data-x]')
+).map(row => ({
+    x: Number(row.dataset.x),
+    y: Number(row.dataset.y),
+    r: Number(row.dataset.r),
+    isHit: row.dataset.hit === 'true'
+}));
 
 function input_is_correct(value) {
     if (typeof value !== 'string' || value.trim() === '') {
@@ -156,49 +163,6 @@ function input_is_correct(value) {
 
     const y = Number(text);
     return Number.isFinite(y) && y > -5 && y < 3;
-}
-
-function check_hit(x, y, r) {
-    const triangle =
-        x <= 0 &&
-        y >= 0 &&
-        y <= x + r / 2;
-
-    const rectangle =
-        x >= -r &&
-        x <= 0 &&
-        y >= -r / 2 &&
-        y <= 0;
-
-    const circle =
-        x >= 0 &&
-        y <= 0 &&
-        x * x + y * y <= (r / 2) ** 2;
-
-    return triangle || rectangle || circle;
-}
-
-function add_element_to_table(record) {
-    const tr = document.createElement('tr');
-
-    const cells = [
-        record.x,
-        record.y,
-        record.r,
-        record.isHit ? 'Попала' : 'Не попала',
-        new Date(record.timestamp).toLocaleString('ru-RU'),
-    ];
-
-    cells.forEach(value => {
-        const td = document.createElement('td');
-        td.textContent = value;
-        tr.appendChild(td);
-    });
-
-    tr.children[3].style.color = record.isHit ? 'green' : 'red';
-    tr.children[3].style.fontWeight = 'bold';
-
-    tbody.prepend(tr);
 }
 
 form.addEventListener('submit', function(event) {

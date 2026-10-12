@@ -114,3 +114,13 @@ input:focus-visible {
     outline-offset: 2px;
 }
 
+#results-table .hit {
+    color: green;
+    font-weight: bold;
+}
+
+#results-table .miss {
+    color: red;
+    font-weight: bold;
+}
+

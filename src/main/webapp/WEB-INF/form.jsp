@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -73,7 +74,6 @@
     <tr>
         <th colspan="2" id="table_data">
             <div class="results-scroll">
-
                 <table id="results-table">
                     <thead>
                     <tr>
@@ -84,9 +84,34 @@
                         <th>Дата и время</th>
                     </tr>
                     </thead>
-                    <tbody id="results-body"></tbody>
+
+                    <tbody id="results-body">
+                    <c:forEach items="${requestScope.results}" var="point">
+                        <tr data-x="${point.x}"
+                            data-y="${point.y}"
+                            data-r="${point.r}"
+                            data-hit="${point.hit}">
+
+                            <td>${point.x}</td>
+                            <td>${point.y}</td>
+                            <td>${point.r}</td>
+
+                            <td class="${point.hit ? 'hit' : 'miss'}">
+                                ${point.hit ? 'Попала' : 'Не попала'}
+                            </td>
+
+                            <td>
+                                <c:out value="${point.timestamp}"/>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
                 </table>
             </div>
+
+            <c:if test="${empty requestScope.results}">
+                <p>Проверок пока нет.</p>
+            </c:if>
 
         </th>
     </tr>
