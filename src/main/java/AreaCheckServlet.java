@@ -15,8 +15,9 @@ public class AreaCheckServlet extends HttpServlet {
         String xText = req.getParameter("coord_X");
         String yText = req.getParameter("coord_Y");
         String rText = req.getParameter("radius_R");
+        boolean fromCanvas = "canvas".equals(req.getParameter("source"));
 
-        if (!AreaChecker.isValid(xText, yText, rText)) {
+        if (!AreaChecker.isValid(xText, yText, rText, fromCanvas)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
             req.getRequestDispatcher("/WEB-INF/error.jsp")
@@ -28,6 +29,7 @@ public class AreaCheckServlet extends HttpServlet {
         double x = Double.parseDouble(xText.trim());
         double y = Double.parseDouble(yText.trim());
         double r = Double.parseDouble(rText.trim());
+        req.getSession().setAttribute("selectedRadius", r);
 
         boolean hit = AreaChecker.isHit(x, y, r);
 

@@ -6,15 +6,46 @@ const coord_X = document.getElementById('coord_X');
 const coord_Y = document.getElementById('coord_Y');
 const xButtons = document.querySelectorAll('#x-buttons button');
 const radiusButtons = document.querySelectorAll('input[name="radius_R"]');
+const sourceInput = document.getElementById('source');
+
+coord_Y.addEventListener('input', () => {
+    sourceInput.value = 'manual';
+});
+// Адрес папки, из которой загружен logic.js.
+const assetsUrl = new URL('.', document.currentScript.src);
+
+const orelImage = new Image();
+const reshkaImage = new Image();
+
+orelImage.addEventListener('error', () => {
+    console.error('Не удалось загрузить:', orelImage.src);
+});
+
+reshkaImage.addEventListener('error', () => {
+    console.error('Не удалось загрузить:', reshkaImage.src);
+});
+
+// Перерисовываем график после загрузки картинок
+orelImage.addEventListener('load', redraw);
+reshkaImage.addEventListener('load', redraw);
+
+orelImage.src = new URL('orel.png', assetsUrl).href;
+reshkaImage.src = new URL('reshka.png', assetsUrl).href;
 
 const allowedX = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2];
 const allowedR = [1, 1.5, 2, 2.5, 3];
 
 function redraw() {
-    const selected = document.querySelector('input[name="radius_R"]:checked');
+    const selected =
+        document.querySelector('input[name="radius_R"]:checked');
 
     if (selected) {
         draw_canvas(Number(selected.value));
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Пока радиус не выбран, показываем только оси.
+        draw_axes(150);
     }
 }
 
@@ -53,7 +84,9 @@ function draw_canvas(r) {
 
     draw_axes(R);
     checkedPoints.forEach(point => {
-        points_to_canvas(point.x, point.y, point.isHit);
+        if (point.r === r) {
+            points_to_canvas(point.x, point.y, point.isHit);
+        }
     });
 }
 
@@ -123,6 +156,8 @@ function draw_axes(R) {
 
 xButtons.forEach(button => {
     button.addEventListener('click', () => {
+        sourceInput.value = 'manual';
+
         coord_X.value = button.dataset.x;
 
         xButtons.forEach(btn => btn.classList.remove('selected'));
@@ -134,10 +169,20 @@ function points_to_canvas(x, y, isHit) {
     const pixelX = x * 50 + 200;
     const pixelY = 200 - y * 50;
 
-    ctx.beginPath();
-    ctx.arc(pixelX, pixelY, 2, 0, Math.PI * 2);
-    ctx.fillStyle = isHit ? 'green' : 'red';
-    ctx.fill();
+    const image = isHit ? orelImage : reshkaImage;
+    const size = 24;
+
+    if (!image.complete || image.naturalWidth === 0) {
+        return;
+    }
+
+    ctx.drawImage(
+        image,
+        pixelX - size / 2,
+        pixelY - size / 2,
+        size,
+        size
+    );
 }
 
 const checkedPoints = Array.from(
@@ -167,31 +212,47 @@ function input_is_correct(value) {
 
 form.addEventListener('submit', function(event) {
     const xText = coord_X.value.trim();
+    const yText = coord_Y.value.trim().replace(',', '.');
+
     const x = Number(xText);
+    const y = Number(yText);
 
     const selectedR =
         document.querySelector('input[name="radius_R"]:checked');
 
-    if (xText === '' || !allowedX.includes(x)) {
+    if (
+        xText === '' ||
+        yText === '' ||
+        !Number.isFinite(x) ||
+        !Number.isFinite(y)
+    ) {
         event.preventDefault();
-        alert('Выберите X с помощью кнопок.');
-        return;
-    }
-
-    if (!input_is_correct(coord_Y.value)) {
-        event.preventDefault();
-        alert('Введите число Y: −5 < Y < 3.');
+        alert('Координаты должны быть конечными числами.');
         return;
     }
 
     if (!selectedR || !allowedR.includes(Number(selectedR.value))) {
         event.preventDefault();
-        alert('Выберите радиус R.');
+        alert('Выберите допустимый радиус R.');
         return;
     }
 
-    // Перед отправкой заменяем десятичную запятую на точку.
-    coord_Y.value = coord_Y.value.trim().replace(',', '.');
+    // Ограничения варианта применяем только к ручному вводу.
+    if (sourceInput.value !== 'canvas') {
+        if (!allowedX.includes(x)) {
+            event.preventDefault();
+            alert('Выберите X с помощью кнопок.');
+            return;
+        }
+
+        if (!input_is_correct(yText)) {
+            event.preventDefault();
+            alert('Введите число Y: −5 < Y < 3.');
+            return;
+        }
+    }
+
+    coord_Y.value = yText;
 });
 
 
@@ -200,19 +261,11 @@ canvas.addEventListener('click', function(event) {
     const selectedR =
         document.querySelector('input[name="radius_R"]:checked');
 
-    if (!selectedR) {
-        alert('Сначала выберите радиус R.');
+    if (!selectedR || !allowedR.includes(Number(selectedR.value))) {
+        alert('Сначала выберите допустимый радиус R.');
         return;
     }
 
-    const r = Number(selectedR.value);
-
-    if (!allowedR.includes(r)) {
-        alert('Выбран недопустимый радиус R.');
-        return;
-    }
-
-    // Переводим положение мыши в пиксели Canvas.
     const rect = canvas.getBoundingClientRect();
 
     const pixelX =
@@ -221,32 +274,13 @@ canvas.addEventListener('click', function(event) {
     const pixelY =
         (event.clientY - rect.top) * canvas.height / rect.height;
 
-    // В графике начало координат — (200, 200),
-    // одна координатная единица занимает 50 пикселей.
-    const rawX = (pixelX - 200) / 50;
-    const rawY = (200 - pixelY) / 50;
-    const y = Number(rawY.toFixed(3));
+    const x = Number(((pixelX - 200) / 50).toFixed(3));
+    const y = Number(((200 - pixelY) / 50).toFixed(3));
 
-
-    // Округляем X до ближайшего значения с шагом 0.5.
-    const roundedX = Math.round(rawX * 2) / 2;
-    const x = roundedX === 0 ? 0 : roundedX;
-
-    if (!allowedX.includes(x)) {
-        alert('Ввод невалидный: округлённый X должен быть от −2 до 2.');
-        return;
-    }
-
-    if (!Number.isFinite(y) || y <= -5 || y >= 3) {
-        alert('Ввод невалидный: Y должен быть строго между −5 и 3.');
-        return;
-    }
-
-    // Записываем координаты в форму. Y не округляем.
     coord_X.value = String(x);
     coord_Y.value = String(y);
+    sourceInput.value = 'canvas';
 
-    // Подсвечиваем кнопку полученного X.
     xButtons.forEach(button => {
         button.classList.toggle(
             'selected',

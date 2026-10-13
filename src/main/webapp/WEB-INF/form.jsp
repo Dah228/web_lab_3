@@ -45,8 +45,9 @@
                     <button type="button" data-x="1">1</button>
                     <button type="button" data-x="1.5">1.5</button>
                     <button type="button" data-x="2">2</button>
-
                     <input type="hidden" name="coord_X" id="coord_X">
+                    <input type="hidden" name="source" id="source" value="manual">
+
                 </fieldset>
 
                 <br><br>
@@ -56,11 +57,16 @@
 
                 <fieldset>
                     <legend>Радиус R:</legend>
-                    <label><input type="radio" name="radius_R" value="1"> 1</label>
-                    <label><input type="radio" name="radius_R" value="1.5"> 1.5</label>
-                    <label><input type="radio" name="radius_R" value="2"> 2</label>
-                    <label><input type="radio" name="radius_R" value="2.5"> 2.5</label>
-                    <label><input type="radio" name="radius_R" value="3" checked> 3</label>
+
+                    <c:forEach items="${[1, 1.5, 2, 2.5, 3]}" var="radius">
+                        <label>
+                            <input type="radio"
+                                   name="radius_R"
+                                   value="${radius}"
+                                   ${sessionScope.selectedRadius eq radius ? 'checked' : ''}>
+                            ${radius}
+                        </label>
+                    </c:forEach>
                 </fieldset>
 
                 <button id="send_button" type="submit"> Отправить</button>
@@ -118,6 +124,6 @@
 
 </table>
 
-<script src="${pageContext.request.contextPath}/logic.js"></script>
+<script src="${pageContext.request.contextPath}/logic.js?v=coins2"></script>
 </body>
 </html>

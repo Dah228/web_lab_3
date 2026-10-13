@@ -6,7 +6,8 @@ public final class AreaChecker {
     // Проверяет строки, полученные через req.getParameter().
     public static boolean isValid(String xText,
                                   String yText,
-                                  String rText) {
+                                  String rText,
+                                  boolean fromCanvas) {
         if (xText == null || yText == null || rText == null) {
             return false;
         }
@@ -20,34 +21,40 @@ public final class AreaChecker {
             double y = Double.parseDouble(yText.trim());
             double r = Double.parseDouble(rText.trim());
 
-            return isValid(x, y, r);
+            return isValid(x, y, r, fromCanvas);
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    // Проверяет допустимые значения чисел.
-    public static boolean isValid(double x, double y, double r) {
+    public static boolean isValid(double x,
+                                  double y,
+                                  double r,
+                                  boolean fromCanvas) {
         if (!Double.isFinite(x)
                 || !Double.isFinite(y)
                 || !Double.isFinite(r)) {
             return false;
         }
 
-        // X: от −2 до 2 с шагом 0.5.
-        boolean validX =
-                x >= -2 && x <= 2 && x * 2 == Math.rint(x * 2);
-
-        // Y: открытый интервал (−5; 3).
-        boolean validY = y > -5 && y < 3;
-
-        // R: одно из разрешённых значений.
         boolean validR =
                 r == 1 || r == 1.5 || r == 2 || r == 2.5 || r == 3;
 
-        return validX && validY && validR;
-    }
+        if (!validR) {
+            return false;
+        }
 
+        if (fromCanvas) {
+            return true;
+        }
+
+        boolean validX =
+                x >= -2 && x <= 2 && x * 2 == Math.rint(x * 2);
+
+        boolean validY = y > -5 && y < 3;
+
+        return validX && validY;
+    }
     // Вызывается после успешной валидации.
     public static boolean isHit(double x, double y, double r) {
         // Треугольник во второй четверти.
